@@ -7,7 +7,7 @@ const main = async (req, res) => {
   const directoryPath = __basedir + "/resources/static/assets/uploads/";
   const specificPath = req.path.slice(7);
   const fileName = getFileName.getFileName(specificPath);
-  const stream = req.query?.stream;
+  const stream = req.query.stream;
 
   if (stream) {
     return streamFile(req, res, directoryPath + specificPath);
