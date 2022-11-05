@@ -1,6 +1,6 @@
 const uploadFile = require("../middleware/upload");
 const fs = require("fs");
-const baseUrl = "http://localhost:8080/files/";
+const baseUrl = "https://storage.minsu.info/files/";
 const getFileName = require("../functions/getFileName");
 
 const main = async (req, res) => {
