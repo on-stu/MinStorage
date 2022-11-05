@@ -1,6 +1,41 @@
 const uploadFile = require("../middleware/upload");
 const fs = require("fs");
 const baseUrl = "http://localhost:8080/files/";
+const getFileName = require("../functions/getFileName");
+
+const main = async (req, res) => {
+  const directoryPath = __basedir + "/resources/static/assets/uploads/";
+  const specificPath = req.path.slice(7);
+  const fileName = getFileName.getFileName(specificPath);
+  const stream = req.query?.stream;
+
+  if (stream) {
+    return streamFile(req, res, directoryPath + specificPath);
+  }
+
+  if (fileName.includes(".")) {
+    return downloadFile(directoryPath + specificPath, res);
+  }
+
+  fs.readdir(directoryPath + specificPath, function (err, files) {
+    if (err) {
+      res.status(500).send({
+        message: "Unable to scan files!",
+      });
+    }
+
+    let fileInfos = [];
+
+    files.forEach((file) => {
+      fileInfos.push({
+        name: file,
+        url: baseUrl + specificPath + "/" + file,
+      });
+    });
+
+    res.status(200).send(fileInfos);
+  });
+};
 
 const upload = async (req, res) => {
   try {
@@ -23,7 +58,7 @@ const upload = async (req, res) => {
     }
 
     res.status(500).send({
-      message: `Could not upload the file: ${req.file.originalname}. ${err}`,
+      message: `Could not upload the file: ${req.file?.originalname}. ${err}`,
     });
   }
 };
@@ -51,27 +86,17 @@ const getListFiles = (req, res) => {
   });
 };
 
-const download = (req, res) => {
-  const fileName = req.params.name;
-  const directoryPath = __basedir + "/resources/static/assets/uploads/";
-
-  res.download(directoryPath + fileName, fileName, (err) => {
-    if (err) {
-      res.status(500).send({
-        message: "Could not download the file. " + err,
-      });
-    }
-  });
+const downloadFile = (filePath, res) => {
+  res.download(filePath);
 };
 
-const stream = (req, res) => {
-  const fileName = req.params.name;
-  const directoryPath = __basedir + "/resources/static/assets/uploads/";
+const streamFile = (req, res, videoPath) => {
   const range = req.headers.range;
-  if (!range) {
+
+  if (range == undefined) {
     res.status(400).send("Requires Range header");
+    return;
   }
-  const videoPath = directoryPath + fileName;
   const videoSize = fs.statSync(videoPath).size;
   const CHUNK_SIZE = 10 ** 6;
   const start = Number(range.replace(/\D/g, ""));
@@ -125,8 +150,7 @@ const removeSync = (req, res) => {
 module.exports = {
   upload,
   getListFiles,
-  download,
   remove,
   removeSync,
-  stream,
+  main,
 };
