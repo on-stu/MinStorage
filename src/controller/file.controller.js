@@ -5,7 +5,8 @@ const getFileName = require("../functions/getFileName");
 
 const main = async (req, res) => {
   const directoryPath = __basedir + "/resources/static/assets/uploads/";
-  const specificPath = req.path.slice(7);
+  let specificPath = req.path.slice(7);
+  specificPath = decodeURI(specificPath);
   const fileName = getFileName.getFileName(specificPath);
   const stream = req.query.stream;
 
@@ -21,6 +22,7 @@ const main = async (req, res) => {
     if (err) {
       res.status(500).send({
         message: "Unable to scan files!",
+        err,
       });
     }
 
