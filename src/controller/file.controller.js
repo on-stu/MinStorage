@@ -2,6 +2,7 @@ const uploadFile = require("../middleware/upload");
 const fs = require("fs");
 const baseUrl = "https://storage.minsu.info/files/";
 const getFileName = require("../functions/getFileName");
+const multer = require("multer");
 
 const main = async (req, res) => {
   const directoryPath = __basedir + "/resources/static/assets/uploads/";
@@ -49,9 +50,13 @@ const upload = async (req, res) => {
     if (req.file == undefined) {
       return res.status(400).send({ message: "Please upload a file!" });
     }
+    const baseDir = __basedir + "/resources/static/assets/uploads/";
+    const filePath = req.file.path;
+    const url = baseUrl + filePath.slice(baseDir.length);
 
     res.status(200).send({
-      message: "Uploaded the file successfully: " + req.file.originalname,
+      message: "Uploaded the file successfully: " + req.file.path,
+      url,
     });
   } catch (err) {
     console.log(err);
