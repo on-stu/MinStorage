@@ -27,15 +27,16 @@ const main = async (req, res) => {
     }
 
     let fileInfos = [];
-    if (typeof files.length === "undefined") {
-      return res.status(500).send();
-    }
-    files.forEach((file) => {
-      fileInfos.push({
-        name: file,
-        url: baseUrl + specificPath + "/" + file,
+    try {
+      files.forEach((file) => {
+        fileInfos.push({
+          name: file,
+          url: baseUrl + specificPath + "/" + file,
+        });
       });
-    });
+    } catch (e) {
+      return res.status(500).send(e.message);
+    }
 
     res.status(200).send(fileInfos);
   });
