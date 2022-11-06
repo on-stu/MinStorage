@@ -27,7 +27,9 @@ const main = async (req, res) => {
     }
 
     let fileInfos = [];
-
+    if (typeof files.length === "undefined") {
+      return res.status(500).send();
+    }
     files.forEach((file) => {
       fileInfos.push({
         name: file,
