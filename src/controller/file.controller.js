@@ -58,6 +58,7 @@ const upload = async (req, res) => {
       message: "Uploaded the file successfully: " + req.file.path,
       url,
     });
+    console.log("wow");
   } catch (err) {
     console.log(err);
 
